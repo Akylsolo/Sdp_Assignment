@@ -1,0 +1,8 @@
+package kz.aitu.assignment2.ui;
+
+public class MacOSCheckbox implements Checkbox {
+    @Override
+    public void paint() {
+        System.out.println("Rendering macOS checkbox");
+    }
+}
