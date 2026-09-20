@@ -1,0 +1,91 @@
+@startuml AbstractFactoryPattern
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam roundcorner 8
+skinparam shadowing true
+skinparam packageStyle rectangle
+
+package "kz.aitu.assignment2.ui" {
+    interface Button <<AbstractProductA>> {
+        +paint(): void
+    }
+
+    interface Checkbox <<AbstractProductB>> {
+        +paint(): void
+    }
+
+    class WindowsButton <<ConcreteProductA1>> {
+        +paint(): void
+    }
+
+    class MacOSButton <<ConcreteProductA2>> {
+        +paint(): void
+    }
+
+    class WindowsCheckbox <<ConcreteProductB1>> {
+        +paint(): void
+    }
+
+    class MacOSCheckbox <<ConcreteProductB2>> {
+        +paint(): void
+    }
+}
+
+package "kz.aitu.assignment2.factory" {
+    interface GUIFactory <<AbstractFactory>> {
+        +createButton(): Button
+        +createCheckbox(): Checkbox
+    }
+
+    class WindowsFactory <<ConcreteFactory1>> {
+        +createButton(): Button
+        +createCheckbox(): Checkbox
+    }
+
+    class MacOSFactory <<ConcreteFactory2>> {
+        +createButton(): Button
+        +createCheckbox(): Checkbox
+    }
+}
+
+package "kz.aitu.assignment2.app" {
+    class DeliveryApplication <<Client>> {
+        -button: Button
+        -checkbox: Checkbox
+        -logistics: Logistics
+        +DeliveryApplication(guiFactory: GUIFactory, logistics: Logistics)
+        +run(cargo: String, destination: String): void
+        +run(): void
+    }
+}
+
+' Realization relationships for UI products
+Button <|.. WindowsButton : realizes
+Button <|.. MacOSButton : realizes
+Checkbox <|.. WindowsCheckbox : realizes
+Checkbox <|.. MacOSCheckbox : realizes
+
+' Realization relationships for GUIFactory
+GUIFactory <|.. WindowsFactory : realizes
+GUIFactory <|.. MacOSFactory : realizes
+
+' Factory creation relationships
+WindowsFactory ..> WindowsButton : <<creates>>
+WindowsFactory ..> WindowsCheckbox : <<creates>>
+MacOSFactory ..> MacOSButton : <<creates>>
+MacOSFactory ..> MacOSCheckbox : <<creates>>
+
+' Client dependencies
+DeliveryApplication --> GUIFactory : <<injected via constructor>>
+DeliveryApplication --> Button : <<uses>>
+DeliveryApplication --> Checkbox : <<uses>>
+
+note right of DeliveryApplication
+  this.button = guiFactory.createButton();
+  this.checkbox = guiFactory.createCheckbox();
+  ...
+  button.paint();
+  checkbox.paint();
+end note
+
+@enduml

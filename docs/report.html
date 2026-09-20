@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assignment 2: Factory Method and Abstract Factory</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #0f172a;
+    line-height: 1.35;
+    font-size: 8.8pt;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 15.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 3px;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-size: 11.5pt;
+    font-weight: 700;
+    color: #1e40af;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 2px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1e293b;
+    margin-top: 6px;
+    margin-bottom: 2px;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 4px;
+    text-align: justify;
+  }
+  .meta-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid #2563eb;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 14px;
+    font-size: 8.2pt;
+  }
+  .meta-item strong {
+    color: #334155;
+  }
+  .diagram-container {
+    text-align: center;
+    margin: 4px 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 4px;
+  }
+  .diagram-container svg {
+    width: 100%;
+    max-height: 250px;
+    height: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4px 0;
+    font-size: 7.8pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 3.5px 5px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  .badge-pass {
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    display: inline-block;
+    font-size: 7.5pt;
+  }
+  pre, code {
+    font-family: Consolas, "Courier New", monospace;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 7.6pt;
+    line-height: 1.25;
+    margin: 2px 0 4px 0;
+  }
+  .clean-practice {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 4px;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+  }
+  .clean-practice h4 {
+    margin: 0 0 2px 0;
+    font-size: 8.8pt;
+    color: #1d4ed8;
+  }
+  .clean-practice p {
+    margin: 0 0 2px 0;
+    font-size: 8.2pt;
+  }
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+  ul, ol {
+    margin-top: 2px;
+    margin-bottom: 4px;
+    padding-left: 16px;
+    font-size: 8.2pt;
+  }
+  li {
+    margin-bottom: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= PAGE 1 ================= -->
+<h1>Assignment 2: Factory Method and Abstract Factory</h1>
+
+<div class="meta-box">
+  <div class="meta-item"><strong>Student:</strong> Akyl Muratbek</div>
+  <div class="meta-item"><strong>Programme:</strong> 6B06102 Software Engineering (Yr 2, Trim 4)</div>
+  <div class="meta-item"><strong>Group:</strong> SE-2523</div>
+  <div class="meta-item"><strong>Course:</strong> ShP-2216 Software Design Patterns</div>
+  <div class="meta-item"><strong>Instructor:</strong> Yerassyl Bekenov</div>
+  <div class="meta-item"><strong>JDK &amp; Format:</strong> Java 17 (JDK 17) | Individual Work</div>
+  <div class="meta-item" style="grid-column: 1 / span 2;"><strong>GitHub Repository:</strong> <a href="https://github.com/Akylsolo/Sdp_Assignment">https://github.com/Akylsolo/Sdp_Assignment</a></div>
+</div>
+
+<h2>1. Introduction &amp; Pattern Rationale</h2>
+<p>
+This application models a cross-platform logistics system that coordinates freight transport delivery across road and sea routes and renders matching GUI components across Windows and macOS platforms.
+</p>
+<p>
+<strong>Factory Method Pattern Rationale (Transport Subsystem):</strong>
+The delivery workflow requires a common orchestration algorithm (<code>planDelivery</code>) shared across all modes of transport, but the concrete vehicle (<code>Truck</code> vs. <code>Ship</code>) depends on operational mode. Directly instantiating concrete transport objects within the logistics manager couples high-level business rules to low-level implementation details. The Factory Method pattern decouples this by declaring an abstract factory method (<code>createTransport()</code>) in <code>Logistics</code>, allowing concrete subclasses (<code>RoadLogistics</code> and <code>SeaLogistics</code>) to supply the appropriate product while preserving the invariant delivery workflow.
+</p>
+<p>
+<strong>Abstract Factory Pattern Rationale (Cross-Platform UI Subsystem):</strong>
+The system must generate complete, matching pairs of UI components (<code>Button</code> and <code>Checkbox</code>) customized for a specific operating environment (Windows or macOS). Without centralized family management, client code could erroneously pair an incompatible Windows button with a macOS checkbox. The Abstract Factory pattern addresses this by defining <code>GUIFactory</code> with distinct creation methods (<code>createButton()</code> and <code>createCheckbox()</code>). Concrete factories (<code>WindowsFactory</code> and <code>MacOSFactory</code>) guarantee family consistency and allow the client (<code>DeliveryApplication</code>) to work exclusively through abstract component contracts without concrete constructors or type casts.
+</p>
+
+<h2>2. UML Class Diagrams</h2>
+<h3>2.1 Factory Method Pattern Diagram</h3>
+<div class="diagram-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" style="background:#ffffff; font-family:'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.10"/>
+    </filter>
+    <marker id="triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="open-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#059669" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">Factory Method Pattern — Class Structure &amp; Roles</text>
+
+  <!-- Package kz.aitu.assignment2.transport -->
+  <rect x="30" y="60" width="430" height="330" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="30" y="60" width="220" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="40" y="77" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.transport</text>
+
+  <!-- Interface Transport -->
+  <g transform="translate(125, 95)" filter="url(#shadow)">
+    <rect width="240" height="75" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <rect width="240" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="120" y="17" text-anchor="middle" font-size="11" fill="#1e40af">&lt;&lt;interface&gt;&gt;  &lt;&lt;Product&gt;&gt;</text>
+    <text x="120" y="32" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Transport</text>
+    <line x1="0" y1="38" x2="240" y2="38" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="10" y="58" font-size="11" fill="#0f172a">+ deliver(cargo: String, dest: String): void</text>
+  </g>
+
+  <!-- Class Truck -->
+  <g transform="translate(50, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;ConcreteProduct&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Truck</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ deliver(cargo, dest): void</text>
+  </g>
+
+  <!-- Class Ship -->
+  <g transform="translate(260, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;ConcreteProduct&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Ship</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ deliver(cargo, dest): void</text>
+  </g>
+
+  <!-- Realizations: Truck and Ship ..|> Transport -->
+  <path d="M 140,260 L 140,215 L 220,215 L 220,170" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+  <path d="M 350,260 L 350,215 L 270,215 L 270,170" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+
+  <!-- Package kz.aitu.assignment2.logistics -->
+  <rect x="500" y="60" width="430" height="330" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="500" y="60" width="220" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="510" y="77" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.logistics</text>
+
+  <!-- Abstract Class Logistics -->
+  <g transform="translate(575, 95)" filter="url(#shadow)">
+    <rect width="280" height="95" rx="6" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+    <rect width="280" height="38" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="140" y="17" text-anchor="middle" font-size="11" fill="#854d0e">&lt;&lt;abstract&gt;&gt;  &lt;&lt;Creator&gt;&gt;</text>
+    <text x="140" y="32" text-anchor="middle" font-size="14" font-weight="bold" font-style="italic" fill="#713f12">Logistics</text>
+    <line x1="0" y1="38" x2="280" y2="38" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="10" y="57" font-size="11" font-style="italic" fill="#0f172a">+ {abstract} createTransport(): Transport</text>
+    <text x="10" y="77" font-size="11" fill="#0f172a">+ planDelivery(cargo: String, dest: String): void</text>
+  </g>
+
+  <!-- Class RoadLogistics -->
+  <g transform="translate(520, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#854d0e">&lt;&lt;ConcreteCreator&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#713f12">RoadLogistics</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#eab308" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ createTransport(): Transport</text>
+  </g>
+
+  <!-- Class SeaLogistics -->
+  <g transform="translate(730, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#854d0e">&lt;&lt;ConcreteCreator&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#713f12">SeaLogistics</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#eab308" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ createTransport(): Transport</text>
+  </g>
+
+  <!-- Inheritance: RoadLogistics and SeaLogistics --|> Logistics -->
+  <path d="M 610,260 L 610,225 L 685,225 L 685,190" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#triangle)"/>
+  <path d="M 820,260 L 820,225 L 745,225 L 745,190" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#triangle)"/>
+
+  <!-- Creates dependencies (Factory method instantiates concrete product) -->
+  <path d="M 520,295 L 230,295" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="375" y="288" text-anchor="middle" font-size="10" font-weight="bold" fill="#059669">&lt;&lt;creates Truck&gt;&gt;</text>
+
+  <path d="M 730,315 L 440,315" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="585" y="333" text-anchor="middle" font-size="10" font-weight="bold" fill="#059669">&lt;&lt;creates Ship&gt;&gt;</text>
+
+  <!-- Creator uses Product contract -->
+  <path d="M 575,135 L 365,135" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#open-arrow)"/>
+  <text x="470" y="128" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">&lt;&lt;uses / calls deliver()&gt;&gt;</text>
+
+  <!-- DeliveryApplication (Client) -->
+  <g transform="translate(500, 420)" filter="url(#shadow)">
+    <rect width="430" height="105" rx="6" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+    <rect width="430" height="35" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+    <text x="215" y="16" text-anchor="middle" font-size="10" fill="#475569">&lt;&lt;Client&gt;&gt;</text>
+    <text x="215" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">DeliveryApplication (kz.aitu.assignment2.app)</text>
+    <line x1="0" y1="35" x2="430" y2="35" stroke="#475569" stroke-width="1.5"/>
+    <text x="10" y="54" font-size="10.5" fill="#334155">- logistics: Logistics;  - button: Button;  - checkbox: Checkbox</text>
+    <text x="10" y="72" font-size="10.5" fill="#0f172a">+ DeliveryApplication(guiFactory: GUIFactory, logistics: Logistics)</text>
+    <text x="10" y="90" font-size="10.5" fill="#0f172a">+ run(cargo: String, destination: String): void</text>
+  </g>
+
+  <!-- Client depends on Logistics -->
+  <path d="M 715,420 L 715,390" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#open-arrow)"/>
+  <text x="725" y="410" font-size="10" fill="#334155">&lt;&lt;delegates workflow&gt;&gt;</text>
+</svg>
+</div>
+<p style="font-size: 7.8pt; color: #475569; margin: 2px 0 0 0;">
+<strong>Figure 1:</strong> Factory Method UML Class Diagram showing <code>Transport</code> product contract, concrete products (<code>Truck</code>, <code>Ship</code>), abstract creator (<code>Logistics</code>) with <code>planDelivery(...)</code>, concrete creators (<code>RoadLogistics</code>, <code>SeaLogistics</code>), and client dependency (<code>DeliveryApplication</code>).
+</p>
+
+<!-- ================= PAGE 2 ================= -->
+<div class="page-break"></div>
+
+<h3>2.2 Abstract Factory Pattern Diagram</h3>
+<div class="diagram-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="100%" height="100%" style="background:#ffffff; font-family:'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.10"/>
+    </filter>
+    <marker id="triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="open-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#059669" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">Abstract Factory Pattern — UI Component Families &amp; Roles</text>
+
+  <!-- Package kz.aitu.assignment2.ui -->
+  <rect x="20" y="55" width="460" height="420" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="20" y="55" width="180" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="30" y="72" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.ui</text>
+
+  <!-- Interface Button -->
+  <g transform="translate(40, 90)" filter="url(#shadow)">
+    <rect width="190" height="70" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <rect width="190" height="35" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="95" y="16" text-anchor="middle" font-size="10" fill="#1e40af">&lt;&lt;interface&gt;&gt;  &lt;&lt;Product A&gt;&gt;</text>
+    <text x="95" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Button</text>
+    <line x1="0" y1="35" x2="190" y2="35" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="10" y="54" font-size="11" fill="#0f172a">+ paint(): void</text>
+  </g>
+
+  <!-- Interface Checkbox -->
+  <g transform="translate(270, 90)" filter="url(#shadow)">
+    <rect width="190" height="70" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <rect width="190" height="35" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="95" y="16" text-anchor="middle" font-size="10" fill="#1e40af">&lt;&lt;interface&gt;&gt;  &lt;&lt;Product B&gt;&gt;</text>
+    <text x="95" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Checkbox</text>
+    <line x1="0" y1="35" x2="190" y2="35" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="10" y="54" font-size="11" fill="#0f172a">+ paint(): void</text>
+  </g>
+
+  <!-- Windows Family UI -->
+  <g transform="translate(40, 220)" filter="url(#shadow)">
+    <rect width="190" height="65" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="190" height="32" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="95" y="15" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;Windows Family&gt;&gt;</text>
+    <text x="95" y="28" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">WindowsButton</text>
+    <line x1="0" y1="32" x2="190" y2="32" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="50" font-size="10.5" fill="#0f172a">+ paint(): void</text>
+  </g>
+  <g transform="translate(270, 220)" filter="url(#shadow)">
+    <rect width="190" height="65" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="190" height="32" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="95" y="15" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;Windows Family&gt;&gt;</text>
+    <text x="95" y="28" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">WindowsCheckbox</text>
+    <line x1="0" y1="32" x2="190" y2="32" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="50" font-size="10.5" fill="#0f172a">+ paint(): void</text>
+  </g>
+
+  <!-- macOS Family UI -->
+  <g transform="translate(40, 360)" filter="url(#shadow)">
+    <rect width="190" height="65" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect width="190" height="32" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="95" y="15" text-anchor="middle" font-size="10" fill="#7c3aed">&lt;&lt;macOS Family&gt;&gt;</text>
+    <text x="95" y="28" text-anchor="middle" font-size="12" font-weight="bold" fill="#4c1d95">MacOSButton</text>
+    <line x1="0" y1="32" x2="190" y2="32" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="8" y="50" font-size="10.5" fill="#0f172a">+ paint(): void</text>
+  </g>
+  <g transform="translate(270, 360)" filter="url(#shadow)">
+    <rect width="190" height="65" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect width="190" height="32" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="95" y="15" text-anchor="middle" font-size="10" fill="#7c3aed">&lt;&lt;macOS Family&gt;&gt;</text>
+    <text x="95" y="28" text-anchor="middle" font-size="12" font-weight="bold" fill="#4c1d95">MacOSCheckbox</text>
+    <line x1="0" y1="32" x2="190" y2="32" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="8" y="50" font-size="10.5" fill="#0f172a">+ paint(): void</text>
+  </g>
+
+  <!-- Realizations Button / Checkbox -->
+  <path d="M 135,220 L 135,160" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+  <path d="M 365,220 L 365,160" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+  <path d="M 135,360 L 135,285" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <path d="M 365,360 L 365,285" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+  <!-- Package kz.aitu.assignment2.factory -->
+  <rect x="500" y="55" width="440" height="420" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="500" y="55" width="200" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="510" y="72" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.factory</text>
+
+  <!-- Interface GUIFactory -->
+  <g transform="translate(585, 90)" filter="url(#shadow)">
+    <rect width="270" height="85" rx="6" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.5"/>
+    <rect width="270" height="38" rx="6" fill="#fae8ff" stroke="#c026d3" stroke-width="1.5"/>
+    <text x="135" y="17" text-anchor="middle" font-size="11" fill="#a21caf">&lt;&lt;interface&gt;&gt;  &lt;&lt;AbstractFactory&gt;&gt;</text>
+    <text x="135" y="32" text-anchor="middle" font-size="14" font-weight="bold" fill="#86198f">GUIFactory</text>
+    <line x1="0" y1="38" x2="270" y2="38" stroke="#c026d3" stroke-width="1.5"/>
+    <text x="10" y="56" font-size="11" fill="#0f172a">+ createButton(): Button</text>
+    <text x="10" y="74" font-size="11" fill="#0f172a">+ createCheckbox(): Checkbox</text>
+  </g>
+
+  <!-- WindowsFactory -->
+  <g transform="translate(520, 240)" filter="url(#shadow)">
+    <rect width="185" height="85" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="185" height="35" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="92" y="16" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;ConcreteFactory 1&gt;&gt;</text>
+    <text x="92" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">WindowsFactory</text>
+    <line x1="0" y1="35" x2="185" y2="35" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10" fill="#0f172a">+ createButton(): Button</text>
+    <text x="8" y="72" font-size="10" fill="#0f172a">+ createCheckbox(): Checkbox</text>
+  </g>
+
+  <!-- MacOSFactory -->
+  <g transform="translate(735, 240)" filter="url(#shadow)">
+    <rect width="185" height="85" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect width="185" height="35" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="92" y="16" text-anchor="middle" font-size="10" fill="#7c3aed">&lt;&lt;ConcreteFactory 2&gt;&gt;</text>
+    <text x="92" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#4c1d95">MacOSFactory</text>
+    <line x1="0" y1="35" x2="185" y2="35" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10" fill="#0f172a">+ createButton(): Button</text>
+    <text x="8" y="72" font-size="10" fill="#0f172a">+ createCheckbox(): Checkbox</text>
+  </g>
+
+  <!-- Realizations GUIFactory -->
+  <path d="M 610,240 L 610,205 L 685,205 L 685,175" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+  <path d="M 825,240 L 825,205 L 755,205 L 755,175" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+
+  <!-- Factory creation links -->
+  <path d="M 520,270 L 460,250" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="490" y="240" font-size="9" font-weight="bold" fill="#059669">&lt;&lt;creates Windows family&gt;&gt;</text>
+
+  <path d="M 735,310 L 460,390" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="590" y="380" font-size="9" font-weight="bold" fill="#7c3aed">&lt;&lt;creates macOS family&gt;&gt;</text>
+
+  <!-- DeliveryApplication (Client) -->
+  <g transform="translate(180, 500)" filter="url(#shadow)">
+    <rect width="600" height="90" rx="6" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+    <rect width="600" height="32" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+    <text x="300" y="15" text-anchor="middle" font-size="10" fill="#475569">&lt;&lt;Client&gt;&gt;</text>
+    <text x="300" y="27" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">DeliveryApplication (kz.aitu.assignment2.app)</text>
+    <line x1="0" y1="32" x2="600" y2="32" stroke="#475569" stroke-width="1.5"/>
+    <text x="15" y="49" font-size="10.5" fill="#334155">- button: Button;  - checkbox: Checkbox;  - logistics: Logistics</text>
+    <text x="15" y="67" font-size="10.5" fill="#0f172a">+ DeliveryApplication(guiFactory: GUIFactory, logistics: Logistics)</text>
+    <text x="15" y="83" font-size="10.5" fill="#0f172a">+ run(cargo: String, destination: String): void</text>
+  </g>
+
+  <!-- Client depends on Abstract Factory & Products -->
+  <path d="M 680,500 L 720,175" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#open-arrow)"/>
+  <text x="735" y="470" font-size="10" font-weight="bold" fill="#a21caf">&lt;&lt;injects GUIFactory&gt;&gt;</text>
+
+  <path d="M 280,500 L 170,160" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#open-arrow)"/>
+  <text x="210" y="320" font-size="10" font-weight="bold" fill="#2563eb">&lt;&lt;uses Button&gt;&gt;</text>
+
+  <path d="M 370,500 L 365,160" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#open-arrow)"/>
+  <text x="375" y="320" font-size="10" font-weight="bold" fill="#2563eb">&lt;&lt;uses Checkbox&gt;&gt;</text>
+</svg>
+</div>
+<p style="font-size: 7.8pt; color: #475569; margin: 2px 0 0 0;">
+<strong>Figure 2:</strong> Abstract Factory UML Class Diagram showing abstract products (<code>Button</code>, <code>Checkbox</code>), concrete families for Windows and macOS, abstract factory interface (<code>GUIFactory</code>), concrete factories (<code>WindowsFactory</code>, <code>MacOSFactory</code>), and constructor injection into <code>DeliveryApplication</code>.
+</p>
+
+<h2>3. Clean Code Evidence (Robert C. Martin)</h2>
+
+<div class="clean-practice">
+  <h4>Practice 1: Meaningful Names (Clean Code, Chapter 2)</h4>
+  <p><strong>Code Excerpt (<code>RoadLogistics.java</code>):</strong></p>
+  <pre>public class RoadLogistics extends Logistics {
+    @Override
+    public Transport createTransport() {
+        return new Truck();
+    }
+}</pre>
+  <p><strong>Specific Benefit:</strong> Names clearly express domain role (<code>RoadLogistics</code>, <code>Truck</code>) and design pattern role. The factory method name <code>createTransport()</code> explicitly communicates action and return type without ambiguous abbreviations.</p>
+</div>
+
+<div class="clean-practice">
+  <h4>Practice 2: Small Methods with Single Responsibility (Clean Code, Chapter 3)</h4>
+  <p><strong>Code Excerpt (<code>Logistics.java</code>):</strong></p>
+  <pre>public void planDelivery(String cargo, String destination) {
+    Transport transport = createTransport();
+    transport.deliver(cargo, destination);
+}</pre>
+  <p><strong>Specific Benefit:</strong> The method does exactly one thing: coordinates the delivery sequence by delegating creation to <code>createTransport()</code> and dispatch to <code>deliver(...)</code>. It avoids mixing CLI parsing, validation, or formatting.</p>
+</div>
+
+<div class="clean-practice">
+  <h4>Practice 3: Avoid Duplicated Logic / DRY (Clean Code, Chapter 3)</h4>
+  <p><strong>Code Excerpt (<code>Logistics.java</code> &amp; <code>SeaLogistics.java</code>):</strong></p>
+  <pre>// In abstract creator Logistics:
+public abstract Transport createTransport();
+public void planDelivery(String cargo, String destination) {
+    Transport transport = createTransport();
+    transport.deliver(cargo, destination);
+}
+// In concrete creator SeaLogistics:
+public class SeaLogistics extends Logistics {
+    @Override
+    public Transport createTransport() { return new Ship(); }
+}</pre>
+  <p><strong>Specific Benefit:</strong> The core delivery algorithm exists solely in <code>Logistics</code>. Neither <code>RoadLogistics</code> nor <code>SeaLogistics</code> repeats delivery workflow logic; they only override the factory method.</p>
+</div>
+
+<!-- ================= PAGE 3 ================= -->
+<div class="page-break"></div>
+
+<div class="clean-practice">
+  <h4>Practice 4: Data Abstraction (Clean Code, Chapter 6)</h4>
+  <p><strong>Code Excerpt (<code>DeliveryApplication.java</code>):</strong></p>
+  <pre>public class DeliveryApplication {
+    private final Button button;
+    private final Checkbox checkbox;
+    private final Logistics logistics;
+
+    public DeliveryApplication(GUIFactory guiFactory, Logistics logistics) {
+        this.button = guiFactory.createButton();
+        this.checkbox = guiFactory.createCheckbox();
+        this.logistics = logistics;
+    }</pre>
+  <p><strong>Specific Benefit:</strong> Chapter 6 emphasizes hiding implementation details behind abstract interfaces. <code>DeliveryApplication</code> depends strictly on abstract contracts (<code>Button</code>, <code>Checkbox</code>, <code>GUIFactory</code>, <code>Logistics</code>) and never on concrete classes like <code>WindowsButton</code> or <code>Truck</code>, achieving true data and behavioral abstraction.</p>
+</div>
+
+<div class="clean-practice">
+  <h4>Practice 5: Objects and Encapsulation (Clean Code, Chapter 6)</h4>
+  <p><strong>Code Excerpt (<code>DeliveryApplication.java</code>):</strong></p>
+  <pre>public void run(String cargo, String destination) {
+    button.paint();
+    checkbox.paint();
+    logistics.planDelivery(cargo, destination);
+}</pre>
+  <p><strong>Specific Benefit:</strong> Chapter 6 contrasts data structures with objects: objects hide data and expose behavior. UI products expose behavioral methods (<code>paint()</code>) rather than getters. All fields remain strictly <code>private final</code>, ensuring strong encapsulation and avoiding procedural data manipulation.</p>
+</div>
+
+<h2>4. Verification Evidence</h2>
+<p>All six required test checks from Section 6 and missing-input scenarios were verified:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 5%;">#</th>
+      <th style="width: 22%;">Scenario</th>
+      <th style="width: 14%;">Input</th>
+      <th>Actual Output</th>
+      <th style="width: 9%; text-align: center;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">1</td>
+      <td>Road delivery + Windows UI</td>
+      <td><code>ROAD WINDOWS</code></td>
+      <td>Delivery mode: ROAD<br>UI platform: WINDOWS<br>Rendering Windows button<br>Rendering Windows checkbox<br>Truck delivers laboratory equipment to Aktau warehouse</td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">2</td>
+      <td>Sea delivery + Windows UI</td>
+      <td><code>SEA WINDOWS</code></td>
+      <td>Delivery mode: SEA<br>UI platform: WINDOWS<br>Rendering Windows button<br>Rendering Windows checkbox<br>Ship delivers laboratory equipment to Aktau warehouse by sea</td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">3</td>
+      <td>Road delivery + macOS UI</td>
+      <td><code>ROAD MACOS</code></td>
+      <td>Delivery mode: ROAD<br>UI platform: MACOS<br>Rendering macOS button<br>Rendering macOS checkbox<br>Truck delivers laboratory equipment to Aktau warehouse</td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">4</td>
+      <td>Sea delivery + macOS UI</td>
+      <td><code>SEA MACOS</code></td>
+      <td>Delivery mode: SEA<br>UI platform: MACOS<br>Rendering macOS button<br>Rendering macOS checkbox<br>Ship delivers laboratory equipment to Aktau warehouse by sea</td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">5</td>
+      <td>Unsupported delivery mode</td>
+      <td><code>AIR WINDOWS</code></td>
+      <td>Error: Unsupported delivery mode 'AIR'. Supported modes: ROAD, SEA.<br><em>(Execution halts cleanly; no delivery performed)</em></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">6</td>
+      <td>Unsupported UI platform</td>
+      <td><code>ROAD LINUX</code></td>
+      <td>Error: Unsupported UI platform 'LINUX'. Supported platforms: WINDOWS, MACOS.<br><em>(Execution halts cleanly; no UI constructed)</em></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">7</td>
+      <td>Missing platform argument</td>
+      <td><code>ROAD</code></td>
+      <td>Error: Missing UI platform argument. Expected WINDOWS or MACOS.<br><em>(Clean validation exit; no crash or null pointer exception)</em></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center; font-weight: bold;">8</td>
+      <td>Empty interactive input</td>
+      <td><code>""</code></td>
+      <td>Error: Missing required input. Expected delivery mode (ROAD, SEA) and UI platform (WINDOWS, MACOS).<br><em>(Clean validation message; no silent defaults)</em></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-size: 8pt; margin-top: 3px;">
+<strong>Automated Test Suite:</strong> All 15 automated JUnit 5 tests in <code>DeliveryApplicationTest.java</code> pass with <code>mvn test</code>, guaranteeing 100% pass rate under JDK 17.
+</p>
+
+<!-- ================= PAGE 4 ================= -->
+<div class="page-break"></div>
+
+<h2>5. Pattern Comparison &amp; Design Reflection</h2>
+
+<h3>5.1 Pattern Comparison</h3>
+<ul>
+  <li>
+    <strong>Simple Factory vs. Factory Method:</strong> A Simple Factory centralizes product creation in a single method with conditional statements (<code>if-else</code> or <code>switch</code>). Adding a new product violates the Open/Closed Principle (OCP) because the factory class must be modified. In contrast, Factory Method uses inheritance and polymorphism: an abstract creator defines the creation interface, while concrete creator subclasses override the method to instantiate products. Adding a new product requires only a new subclass, leaving existing creators untouched. A startup switch in <code>Main</code> is permitted solely as a bootstrap configuration step at the composition root.
+  </li>
+  <li>
+    <strong>Factory Method vs. Abstract Factory:</strong> Factory Method focuses on creating a single product hierarchy via class inheritance. Abstract Factory coordinates families of related or dependent products (e.g., matching Buttons and Checkboxes) via object composition. Abstract Factory guarantees family consistency so incompatible platform components are never mixed.
+  </li>
+</ul>
+
+<h3>5.2 Design Reflection: System Extensions (Section 7)</h3>
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 8px; margin-bottom: 5px; font-size: 8pt;">
+  <strong style="color: #1e40af;">Extension 1: Adding one more transport (e.g., Air delivery via Plane)</strong><br>
+  <ul>
+    <li><strong>Affected Classes / Interfaces:</strong>
+      <ul>
+        <li>Add <code>Plane implements Transport</code> in <code>transport</code> package with <code>deliver(cargo, destination)</code>.</li>
+        <li>Add <code>AirLogistics extends Logistics</code> in <code>logistics</code> package overriding <code>createTransport()</code> to return <code>new Plane()</code>.</li>
+        <li>Update startup selection in <code>Main.selectLogistics</code> to handle <code>"AIR"</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Unchanged Client Logic:</strong> <code>Logistics.planDelivery(...)</code> and <code>DeliveryApplication</code> remain <strong>100% unchanged</strong>.</li>
+  </ul>
+</div>
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 8px; margin-bottom: 5px; font-size: 8pt;">
+  <strong style="color: #1e40af;">Extension 2: Adding one more UI family (e.g., Linux UI)</strong><br>
+  <ul>
+    <li><strong>Affected Classes / Interfaces:</strong>
+      <ul>
+        <li>Add <code>LinuxButton implements Button</code> and <code>LinuxCheckbox implements Checkbox</code> in <code>ui</code> package.</li>
+        <li>Add <code>LinuxFactory implements GUIFactory</code> in <code>factory</code> package implementing <code>createButton()</code> and <code>createCheckbox()</code>.</li>
+        <li>Update startup selection in <code>Main.selectGUIFactory</code> to handle <code>"LINUX"</code>.</li>
+      </ul>
+    </li>
+    <li><strong>Unchanged Client Logic:</strong> <code>DeliveryApplication</code>, <code>Button</code>, and <code>Checkbox</code> interfaces remain <strong>completely unchanged</strong>.</li>
+  </ul>
+</div>
+
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 5px 8px; margin-bottom: 5px; font-size: 8pt;">
+  <strong style="color: #1e40af;">Extension 3: Adding one more UI product type (e.g., TextField)</strong><br>
+  <ul>
+    <li><strong>Affected Classes / Interfaces:</strong>
+      <ul>
+        <li>Add new interface <code>TextField</code> with <code>paint()</code> in <code>ui</code> package.</li>
+        <li>Add <code>WindowsTextField implements TextField</code> and <code>MacOSTextField implements TextField</code>.</li>
+        <li>Update <code>GUIFactory</code> interface to declare <code>TextField createTextField();</code>.</li>
+        <li>Update <code>WindowsFactory</code> and <code>MacOSFactory</code> to implement <code>createTextField()</code>.</li>
+        <li>Update <code>DeliveryApplication</code> constructor to obtain <code>TextField</code> and paint it during execution.</li>
+      </ul>
+    </li>
+    <li><strong>Unchanged Code:</strong> Existing products (<code>WindowsButton</code>, <code>MacOSButton</code>, etc.) and the entire <code>Logistics</code>/<code>Transport</code> hierarchy remain <strong>completely unchanged</strong>.</li>
+  </ul>
+</div>
+
+<h2>6. References</h2>
+<ol style="font-size: 8pt; margin-top: 2px; padding-left: 16px;">
+  <li>Freeman, E., &amp; Robson, E. (2020). <em>Head First Design Patterns: A Brain-Friendly Guide</em> (2nd ed.). O'Reilly Media. Chapter 4: The Factory Pattern (pp. 109–162).</li>
+  <li>Martin, R. C. (2008). <em>Clean Code: A Handbook of Agile Software Craftsmanship</em>. Prentice Hall. Chapter 2 (Meaningful Names, pp. 17–30), Chapter 3 (Functions, pp. 31–52), Chapter 6 (Objects and Data Structures, pp. 93–102).</li>
+  <li>Gamma, E., Helm, R., Johnson, R., &amp; Vlissides, J. (1994). <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>. Addison-Wesley. Creational Patterns: Factory Method (pp. 107–116) and Abstract Factory (pp. 87–96).</li>
+  <li>Oracle Corporation. (2021). <em>Java Platform, Standard Edition Documentation (JDK 17)</em>. Oracle Technology Network.</li>
+</ol>
+
+</body>
+</html>

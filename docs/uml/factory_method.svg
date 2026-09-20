@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" style="background:#ffffff; font-family:'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.10"/>
+    </filter>
+    <marker id="triangle" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="open-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#333333" stroke-width="1.5"/>
+    </marker>
+    <marker id="green-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <polyline points="0,1 9,5 0,9" fill="none" stroke="#059669" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">Factory Method Pattern — Class Structure &amp; Roles</text>
+
+  <!-- Package kz.aitu.assignment2.transport -->
+  <rect x="30" y="60" width="430" height="330" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="30" y="60" width="220" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="40" y="77" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.transport</text>
+
+  <!-- Interface Transport -->
+  <g transform="translate(125, 95)" filter="url(#shadow)">
+    <rect width="240" height="75" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <rect width="240" height="38" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="120" y="17" text-anchor="middle" font-size="11" fill="#1e40af">&lt;&lt;interface&gt;&gt;  &lt;&lt;Product&gt;&gt;</text>
+    <text x="120" y="32" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Transport</text>
+    <line x1="0" y1="38" x2="240" y2="38" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="10" y="58" font-size="11" fill="#0f172a">+ deliver(cargo: String, dest: String): void</text>
+  </g>
+
+  <!-- Class Truck -->
+  <g transform="translate(50, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;ConcreteProduct&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Truck</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ deliver(cargo, dest): void</text>
+  </g>
+
+  <!-- Class Ship -->
+  <g transform="translate(260, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#2563eb">&lt;&lt;ConcreteProduct&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Ship</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ deliver(cargo, dest): void</text>
+  </g>
+
+  <!-- Realizations: Truck and Ship ..|> Transport -->
+  <path d="M 140,260 L 140,215 L 220,215 L 220,170" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+  <path d="M 350,260 L 350,215 L 270,215 L 270,170" fill="none" stroke="#333333" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#triangle)"/>
+
+  <!-- Package kz.aitu.assignment2.logistics -->
+  <rect x="500" y="60" width="430" height="330" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" filter="url(#shadow)"/>
+  <rect x="500" y="60" width="220" height="24" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="510" y="77" font-size="11" font-weight="bold" fill="#334155">kz.aitu.assignment2.logistics</text>
+
+  <!-- Abstract Class Logistics -->
+  <g transform="translate(575, 95)" filter="url(#shadow)">
+    <rect width="280" height="95" rx="6" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+    <rect width="280" height="38" rx="6" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="140" y="17" text-anchor="middle" font-size="11" fill="#854d0e">&lt;&lt;abstract&gt;&gt;  &lt;&lt;Creator&gt;&gt;</text>
+    <text x="140" y="32" text-anchor="middle" font-size="14" font-weight="bold" font-style="italic" fill="#713f12">Logistics</text>
+    <line x1="0" y1="38" x2="280" y2="38" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="10" y="57" font-size="11" font-style="italic" fill="#0f172a">+ {abstract} createTransport(): Transport</text>
+    <text x="10" y="77" font-size="11" fill="#0f172a">+ planDelivery(cargo: String, dest: String): void</text>
+  </g>
+
+  <!-- Class RoadLogistics -->
+  <g transform="translate(520, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#854d0e">&lt;&lt;ConcreteCreator&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#713f12">RoadLogistics</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#eab308" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ createTransport(): Transport</text>
+  </g>
+
+  <!-- Class SeaLogistics -->
+  <g transform="translate(730, 260)" filter="url(#shadow)">
+    <rect width="180" height="70" rx="6" fill="#ffffff" stroke="#eab308" stroke-width="1.5"/>
+    <rect width="180" height="35" rx="6" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+    <text x="90" y="16" text-anchor="middle" font-size="10" fill="#854d0e">&lt;&lt;ConcreteCreator&gt;&gt;</text>
+    <text x="90" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#713f12">SeaLogistics</text>
+    <line x1="0" y1="35" x2="180" y2="35" stroke="#eab308" stroke-width="1.5"/>
+    <text x="8" y="54" font-size="10.5" fill="#0f172a">+ createTransport(): Transport</text>
+  </g>
+
+  <!-- Inheritance: RoadLogistics and SeaLogistics --|> Logistics -->
+  <path d="M 610,260 L 610,225 L 685,225 L 685,190" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#triangle)"/>
+  <path d="M 820,260 L 820,225 L 745,225 L 745,190" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#triangle)"/>
+
+  <!-- Creates dependencies (Factory method instantiates concrete product) -->
+  <path d="M 520,295 L 230,295" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="375" y="288" text-anchor="middle" font-size="10" font-weight="bold" fill="#059669">&lt;&lt;creates Truck&gt;&gt;</text>
+
+  <path d="M 730,315 L 440,315" fill="none" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#green-arrow)"/>
+  <text x="585" y="333" text-anchor="middle" font-size="10" font-weight="bold" fill="#059669">&lt;&lt;creates Ship&gt;&gt;</text>
+
+  <!-- Creator uses Product contract -->
+  <path d="M 575,135 L 365,135" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#open-arrow)"/>
+  <text x="470" y="128" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">&lt;&lt;uses / calls deliver()&gt;&gt;</text>
+
+  <!-- DeliveryApplication (Client) -->
+  <g transform="translate(500, 420)" filter="url(#shadow)">
+    <rect width="430" height="105" rx="6" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+    <rect width="430" height="35" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+    <text x="215" y="16" text-anchor="middle" font-size="10" fill="#475569">&lt;&lt;Client&gt;&gt;</text>
+    <text x="215" y="30" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">DeliveryApplication (kz.aitu.assignment2.app)</text>
+    <line x1="0" y1="35" x2="430" y2="35" stroke="#475569" stroke-width="1.5"/>
+    <text x="10" y="54" font-size="10.5" fill="#334155">- logistics: Logistics;  - button: Button;  - checkbox: Checkbox</text>
+    <text x="10" y="72" font-size="10.5" fill="#0f172a">+ DeliveryApplication(guiFactory: GUIFactory, logistics: Logistics)</text>
+    <text x="10" y="90" font-size="10.5" fill="#0f172a">+ run(cargo: String, destination: String): void</text>
+  </g>
+
+  <!-- Client depends on Logistics -->
+  <path d="M 715,420 L 715,390" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#open-arrow)"/>
+  <text x="725" y="410" font-size="10" fill="#334155">&lt;&lt;delegates workflow&gt;&gt;</text>
+</svg>

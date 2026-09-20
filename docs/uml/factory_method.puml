@@ -1,0 +1,71 @@
+@startuml FactoryMethodPattern
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam roundcorner 8
+skinparam shadowing true
+skinparam packageStyle rectangle
+
+package "kz.aitu.assignment2.transport" {
+    interface Transport <<Product>> {
+        +deliver(cargo: String, destination: String): void
+    }
+
+    class Truck <<ConcreteProduct>> {
+        +deliver(cargo: String, destination: String): void
+    }
+
+    class Ship <<ConcreteProduct>> {
+        +deliver(cargo: String, destination: String): void
+    }
+}
+
+package "kz.aitu.assignment2.logistics" {
+    abstract class Logistics <<Creator>> {
+        +{abstract} createTransport(): Transport
+        +planDelivery(cargo: String, destination: String): void
+    }
+
+    class RoadLogistics <<ConcreteCreator>> {
+        +createTransport(): Transport
+    }
+
+    class SeaLogistics <<ConcreteCreator>> {
+        +createTransport(): Transport
+    }
+}
+
+package "kz.aitu.assignment2.app" {
+    class DeliveryApplication <<Client>> {
+        -button: Button
+        -checkbox: Checkbox
+        -logistics: Logistics
+        +DeliveryApplication(guiFactory: GUIFactory, logistics: Logistics)
+        +run(cargo: String, destination: String): void
+        +run(): void
+    }
+}
+
+' Realization relationships
+Transport <|.. Truck : realizes
+Transport <|.. Ship : realizes
+
+' Inheritance relationships
+Logistics <|-- RoadLogistics : extends
+Logistics <|-- SeaLogistics : extends
+
+' Creation relationships
+RoadLogistics ..> Truck : <<creates>>
+SeaLogistics ..> Ship : <<creates>>
+
+' Creator depends on product
+Logistics ..> Transport : <<uses / calls deliver()>>
+
+' Client depends on Creator
+DeliveryApplication --> Logistics : <<delegates workflow>>
+
+note right of Logistics::planDelivery
+  Transport transport = createTransport();
+  transport.deliver(cargo, destination);
+end note
+
+@enduml
